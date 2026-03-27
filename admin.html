@@ -1198,7 +1198,10 @@
       const SUPABASE_ANON =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrYmR2YXlocXh3eXVpYmlvZmNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MTQzMzcsImV4cCI6MjA5MDE5MDMzN30.LtrwdKy-vMf9NFt7fiB6yPuUMr7PbZeRtr6quMMoL6o";
 
-      const SB = (path, opts = {}) =>
+      const TG_TOKEN   = '8780320555:AAE4xrpmuUcrd8lChg7ir8_2QCtkNMye69c';
+      const TG_CHAT_ID = '7788277220';
+      
+        const SB = (path, opts = {}) =>
         fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
           headers: {
             "apikey": SUPABASE_ANON,
@@ -1475,7 +1478,7 @@
         updateDashboard();
         showToast(`✅ ${name} 已新增`, "success");
         if (document.getElementById("t-new").checked) {
-          sendLineNotify(`📋 新住戶加入：${name}（${unit}）`);
+          sendTelegram(`📋 新住戶加入：${name}（${unit}）`);
         }
       }
 
@@ -1692,29 +1695,23 @@
       }
 
       async function testNotify() {
-        const ok = await sendLineNotify("🔔 竹逸門禁系統測試推播 — 設定成功！");
+        const ok = await sendTelegram("🔔 竹逸門禁系統測試推播 — 設定成功！");
         showToast(
           ok ? "📩 推播發送成功！" : "❌ 推播失敗，請確認 Token",
           ok ? "success" : "error",
         );
       }
 
-      async function sendLineNotify(msg) {
-        const token = localStorage.getItem("lineToken");
-        if (!token) return false;
+       
+      async function sendTelegram(msg) {
         try {
-          await fetch("https://notify-api.line.me/api/notify", {
-            method: "POST",
-            headers: {
-              "Authorization": "Bearer " + token,
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: "message=" + encodeURIComponent("\n" + msg),
-          });
-          return true;
-        } catch {
-          return false;
-        }
+         await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ chat_id: TG_CHAT_ID, text: msg })
+            });
+            return true;
+        } catch { return false; }
       }
 
       function saveNotifySettings() {
